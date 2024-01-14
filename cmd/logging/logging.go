@@ -13,25 +13,27 @@ type Logger interface {
 }
 
 type GutHubLogger struct {
-	infoLog *log.Logger
-	errLog  *log.Logger
+	infoLog  *log.Logger
+	errLog   *log.Logger
+	debugLog *log.Logger
 }
 
-func NewGutHubLogger(out, outErr io.Writer, prefix string, flag int) *GutHubLogger {
+func NewGutHubLogger(infoOut, debugOut, errOut io.Writer, prefix string, flag int) *GutHubLogger {
 	return &GutHubLogger{
-		infoLog: log.New(out, prefix, flag),
-		errLog:  log.New(outErr, prefix, flag),
+		infoLog:  log.New(infoOut, prefix+"INFO: ", flag),
+		debugLog: log.New(debugOut, prefix+">>> DEBUG: ", flag),
+		errLog:   log.New(errOut, prefix+"ERROR: ", flag),
 	}
 }
 
 func (l *GutHubLogger) Info(v ...any) {
-	l.infoLog.Print("INFO: ", fmt.Sprintln(v...))
+	l.infoLog.Print(fmt.Sprintln(v...))
 }
 
 func (l *GutHubLogger) Error(v ...any) {
-	l.errLog.Print("ERROR: ", fmt.Sprintln(v...))
+	l.errLog.Print(fmt.Sprintln(v...))
 }
 
 func (l *GutHubLogger) Debug(v ...any) {
-	l.infoLog.Print(">>> DEBUG: ", fmt.Sprintln(v...))
+	l.debugLog.Print(fmt.Sprintln(v...))
 }

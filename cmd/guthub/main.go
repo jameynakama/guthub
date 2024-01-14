@@ -21,7 +21,7 @@ func main() {
 	repoLimit := flag.Int("l", DEFAULT_LIMIT, "limit of repositories to scrape")
 	flag.Parse()
 
-	logger := logging.NewGutHubLogger(os.Stdout, os.Stderr, "[GUTHUB] ", 0)
+	logger := logging.NewGutHubLogger(os.Stdout, os.Stdout, os.Stderr, "[GUTHUB] ", 0)
 	client := githubapi.NewGitHubAPIClient(os.Getenv("GH_TOKEN"), logger)
 
 	cfg := cfg{
