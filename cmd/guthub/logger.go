@@ -23,10 +23,6 @@ func NewGutHubLogger(out, outErr io.Writer, prefix string, flag int) *GutHubLogg
 	}
 }
 
-func (l *GutHubLogger) Println(v ...any) {
-	l.infoLog.Println(v...)
-}
-
 func (l *GutHubLogger) Info(v ...any) {
 	l.infoLog.Print("INFO: ", fmt.Sprintln(v...))
 }

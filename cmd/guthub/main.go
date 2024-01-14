@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 )
 
@@ -11,6 +12,11 @@ type cfg struct {
 	repoLimit int
 	url       string
 	infoLog   Logger
+}
+
+type repo struct {
+	author string
+	name   string
 }
 
 func main() {
@@ -32,9 +38,9 @@ func run(cfg cfg) {
 	sh := newScrapeHelper(cfg.infoLog)
 	sh.getTrendingRepos(cfg.url, cfg.repoLimit)
 
-	for _, repo := range sh.toScrape {
+	for _, repo := range sh.repos {
 		// TODO: Use GH API to get text files
 		// TODO: Maybe even get comments eventually
-		cfg.infoLog.Info(repo)
+		cfg.infoLog.Info(fmt.Sprintf("%+v", repo))
 	}
 }

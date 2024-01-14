@@ -8,8 +8,8 @@ import (
 )
 
 type scrapeHelper struct {
-	toScrape []string
-	logger   Logger
+	repos  []repo
+	logger Logger
 }
 
 func newScrapeHelper(logger Logger) *scrapeHelper {
@@ -27,14 +27,15 @@ func (s *scrapeHelper) getTrendingRepos(url string, limit int) {
 	}
 
 	c.OnHTML(repoSelector, func(e *colly.HTMLElement) {
-		if len(s.toScrape) >= limit {
+		if len(s.repos) >= limit {
 			return
 		}
 		link := e.Attr("href")
-		if !strings.HasPrefix(link, "http") {
-			link = e.Request.AbsoluteURL(link)
-		}
-		s.toScrape = append(s.toScrape, link)
+		linkParts := strings.Split(strings.Trim(link, "/"), "/")
+		s.repos = append(s.repos, repo{
+			author: linkParts[0],
+			name:   linkParts[1],
+		})
 	})
 
 	c.OnRequest(func(r *colly.Request) {
