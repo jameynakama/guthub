@@ -2,7 +2,10 @@ module github.com/jameynakama/guthub
 
 go 1.21.1
 
-require github.com/gocolly/colly/v2 v2.1.0
+require (
+	github.com/gocolly/colly/v2 v2.1.0
+	github.com/jameynakama/assert v0.0.0-20240111183826-d047f99fcaae
+)
 
 require (
 	github.com/PuerkitoBio/goquery v1.5.1 // indirect
