@@ -2,32 +2,14 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"net/http/httptest"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/jameynakama/assert"
+	"github.com/jameynakama/guthub/cmd/guthub/testhelpers"
 )
 
-func newTestServer(filename string) *httptest.Server {
-	server := httptest.NewServer(
-		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			html, err := os.ReadFile(filepath.Join("testdata", filename))
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "error reading testdata/%s: %v\n", filename, err)
-				os.Exit(1)
-			}
-			w.Header().Set("Content-Type", "text/html")
-			fmt.Fprintln(w, string(html))
-		}),
-	)
-	return server
-}
-
 func TestGetRepos(t *testing.T) {
-	server := newTestServer("trending.html")
+	server := testhelpers.NewTestServer("trending.html")
 	defer server.Close()
 
 	expUrls := []string{
@@ -37,13 +19,13 @@ func TestGetRepos(t *testing.T) {
 	}
 
 	var sh scrapeHelper
-	sh.getTrendingRepos(cfg{repoLimit: 3}, server.URL)
+	sh.getTrendingRepos(server.URL, 3)
 
 	assert.Equal(t, sh.toScrape, expUrls)
 }
 
 func TestGetRepoDefaultLimit(t *testing.T) {
-	server := newTestServer("trending.html")
+	server := testhelpers.NewTestServer("trending.html")
 	defer server.Close()
 
 	expUrls := []string{
@@ -55,13 +37,13 @@ func TestGetRepoDefaultLimit(t *testing.T) {
 	}
 
 	var sh scrapeHelper
-	sh.getTrendingRepos(cfg{repoLimit: DEFAULT_LIMIT}, server.URL)
+	sh.getTrendingRepos(server.URL, DEFAULT_LIMIT)
 
 	assert.Equal(t, sh.toScrape, expUrls)
 }
 
 func TestGetReposRelativeURLs(t *testing.T) {
-	server := newTestServer("trending_relative_urls.html")
+	server := testhelpers.NewTestServer("trending_relative_urls.html")
 	defer server.Close()
 
 	expUrls := []string{
@@ -69,7 +51,7 @@ func TestGetReposRelativeURLs(t *testing.T) {
 	}
 
 	var sh scrapeHelper
-	sh.getTrendingRepos(cfg{repoLimit: 1}, server.URL)
+	sh.getTrendingRepos(server.URL, 1)
 
 	assert.Equal(t, sh.toScrape, expUrls)
 }

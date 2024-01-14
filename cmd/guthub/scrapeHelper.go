@@ -12,7 +12,7 @@ type scrapeHelper struct {
 	toScrape []string
 }
 
-func (s *scrapeHelper) getTrendingRepos(cfg cfg, url string) {
+func (s *scrapeHelper) getTrendingRepos(url string, limit int) {
 	c := colly.NewCollector()
 
 	repoSelector, found := os.LookupEnv("REPO_SELECTOR")
@@ -21,7 +21,7 @@ func (s *scrapeHelper) getTrendingRepos(cfg cfg, url string) {
 	}
 
 	c.OnHTML(repoSelector, func(e *colly.HTMLElement) {
-		if len(s.toScrape) >= cfg.repoLimit {
+		if len(s.toScrape) >= limit {
 			return
 		}
 		link := e.Attr("href")
