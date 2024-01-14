@@ -5,16 +5,18 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
+	"github.com/jameynakama/guthub/cmd/githubapi"
+	"github.com/jameynakama/guthub/cmd/logging"
 )
 
 type scrapeHelper struct {
-	repos  []repo
-	logger Logger
+	repos  []githubapi.Repo
+	logger logging.Logger
 }
 
-func newScrapeHelper(logger Logger) *scrapeHelper {
+func newScrapeHelper(l logging.Logger) *scrapeHelper {
 	return &scrapeHelper{
-		logger: logger,
+		logger: l,
 	}
 }
 
@@ -32,9 +34,9 @@ func (s *scrapeHelper) getTrendingRepos(url string, limit int) {
 		}
 		link := e.Attr("href")
 		linkParts := strings.Split(strings.Trim(link, "/"), "/")
-		s.repos = append(s.repos, repo{
-			author: linkParts[0],
-			name:   linkParts[1],
+		s.repos = append(s.repos, githubapi.Repo{
+			Author: linkParts[0],
+			Name:   linkParts[1],
 		})
 	})
 

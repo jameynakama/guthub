@@ -1,4 +1,4 @@
-package main
+package logging
 
 import (
 	"fmt"
@@ -9,6 +9,7 @@ import (
 type Logger interface {
 	Info(v ...any)
 	Error(v ...any)
+	Debug(v ...any)
 }
 
 type GutHubLogger struct {
@@ -29,4 +30,8 @@ func (l *GutHubLogger) Info(v ...any) {
 
 func (l *GutHubLogger) Error(v ...any) {
 	l.errLog.Print("ERROR: ", fmt.Sprintln(v...))
+}
+
+func (l *GutHubLogger) Debug(v ...any) {
+	l.infoLog.Print(">>> DEBUG: ", fmt.Sprintln(v...))
 }
