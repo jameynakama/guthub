@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -10,6 +9,13 @@ import (
 
 type scrapeHelper struct {
 	toScrape []string
+	logger   Logger
+}
+
+func newScrapeHelper(logger Logger) *scrapeHelper {
+	return &scrapeHelper{
+		logger: logger,
+	}
 }
 
 func (s *scrapeHelper) getTrendingRepos(url string, limit int) {
@@ -32,7 +38,7 @@ func (s *scrapeHelper) getTrendingRepos(url string, limit int) {
 	})
 
 	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("Getting repos to scrape...")
+		s.logger.Info("Getting repos to scrape...")
 	})
 
 	c.Visit(url)

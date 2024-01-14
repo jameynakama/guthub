@@ -8,8 +8,17 @@ import (
 	"github.com/jameynakama/guthub/cmd/guthub/testhelpers"
 )
 
+type testLogger struct{}
+
+func (l *testLogger) Info(v ...any)  {}
+func (l *testLogger) Error(v ...any) {}
+
 func TestGetRepos(t *testing.T) {
-	server := testhelpers.NewTestServer("trending.html")
+	server, err := testhelpers.NewTestServer("trending.html")
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	defer server.Close()
 
 	expUrls := []string{
@@ -18,14 +27,17 @@ func TestGetRepos(t *testing.T) {
 		"https://example.com/the-sisters-karamazov/",
 	}
 
-	var sh scrapeHelper
+	sh := newScrapeHelper(&testLogger{})
 	sh.getTrendingRepos(server.URL, 3)
 
 	assert.Equal(t, sh.toScrape, expUrls)
 }
 
 func TestGetRepoDefaultLimit(t *testing.T) {
-	server := testhelpers.NewTestServer("trending.html")
+	server, err := testhelpers.NewTestServer("trending.html")
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer server.Close()
 
 	expUrls := []string{
@@ -36,21 +48,24 @@ func TestGetRepoDefaultLimit(t *testing.T) {
 		"https://example.com/cycle-jordan/",
 	}
 
-	var sh scrapeHelper
+	sh := newScrapeHelper(&testLogger{})
 	sh.getTrendingRepos(server.URL, DEFAULT_LIMIT)
 
 	assert.Equal(t, sh.toScrape, expUrls)
 }
 
 func TestGetReposRelativeURLs(t *testing.T) {
-	server := testhelpers.NewTestServer("trending_relative_urls.html")
+	server, err := testhelpers.NewTestServer("trending_relative_urls.html")
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer server.Close()
 
 	expUrls := []string{
 		fmt.Sprintf("%s/ugly-cats/", server.URL),
 	}
 
-	var sh scrapeHelper
+	sh := newScrapeHelper(&testLogger{})
 	sh.getTrendingRepos(server.URL, 1)
 
 	assert.Equal(t, sh.toScrape, expUrls)
