@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"os"
 
+	"github.com/google/go-github/v58/github"
 	"github.com/jameynakama/guthub/cmd/githubapi"
 	"github.com/jameynakama/guthub/cmd/logging"
+	"golang.org/x/oauth2"
 )
 
 const DEFAULT_LIMIT = 25
@@ -14,7 +17,7 @@ type cfg struct {
 	repoLimit int
 	url       string
 	logger    logging.Logger
-	ghClient  *githubapi.GitHubAPIClient
+	ghClient  *githubapi.GutHubHelper
 }
 
 func main() {
@@ -22,7 +25,13 @@ func main() {
 	flag.Parse()
 
 	logger := logging.NewGutHubLogger(os.Stdout, os.Stdout, os.Stderr, "[GUTHUB] ", 0)
-	client := githubapi.NewGitHubAPIClient(os.Getenv("GH_TOKEN"), logger)
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: os.Getenv("GH_TOKEN")},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	ghClient := github.NewClient(tc)
+	client := githubapi.NewGutHubClient(ctx, ghClient.Repositories, logger)
 
 	cfg := cfg{
 		repoLimit: *repoLimit,

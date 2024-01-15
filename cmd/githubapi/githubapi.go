@@ -9,7 +9,6 @@ import (
 
 	"github.com/google/go-github/v58/github"
 	"github.com/jameynakama/guthub/cmd/logging"
-	"golang.org/x/oauth2"
 )
 
 type Repo struct {
@@ -18,48 +17,30 @@ type Repo struct {
 	Readme string
 }
 
-type GitHubAPI interface {
+type RepositoriesClient interface {
 	GetReadme(
 		ctx context.Context,
 		owner,
 		repo string,
 		opts *github.RepositoryContentGetOptions,
-	) (
-		file *github.RepositoryContent,
-		directoryContent []*github.RepositoryContent,
-		resp *github.Response,
-		err error,
-	)
+	) (*github.RepositoryContent, *github.Response, error)
 }
 
-type GitHubAPIClient struct {
-	client    *github.Client
-	authToken string
-	logger    logging.Logger
+type GutHubHelper struct {
+	ctx        context.Context
+	RepoClient RepositoriesClient
+	logger     logging.Logger
 }
 
-func NewGitHubAPIClient(authToken string, l logging.Logger) *GitHubAPIClient {
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: authToken},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-
-	return &GitHubAPIClient{
-		client:    github.NewClient(tc),
-		authToken: authToken,
-		logger:    l,
+func NewGutHubClient(ctx context.Context, rClient RepositoriesClient, l logging.Logger) *GutHubHelper {
+	return &GutHubHelper{
+		ctx:        ctx,
+		RepoClient: rClient,
+		logger:     l,
 	}
 }
 
-func (c *GitHubAPIClient) GetReadmes(repos []Repo) {
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: c.authToken},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-	client := github.NewClient(tc)
-
+func (c *GutHubHelper) GetReadmes(repos []Repo) {
 	var wg sync.WaitGroup
 	errCh := make(chan error, len(repos))
 	repoCh := make(chan Repo, len(repos))
@@ -74,13 +55,19 @@ func (c *GitHubAPIClient) GetReadmes(repos []Repo) {
 
 			c.logger.Info(fmt.Sprintf("Fetching %q README", repo.Name))
 
-			readme, err := getReadme(ctx, client, repo)
+			readme, _, err := c.RepoClient.GetReadme(c.ctx, repo.Author, repo.Name, nil)
 			if err != nil {
 				errCh <- err
 				return
 			}
 
-			repo.Readme = readme
+			content, err := readme.GetContent()
+			if err != nil {
+				errCh <- err
+				return
+			}
+
+			repo.Readme = content
 
 			repoCh <- repo
 		}(repo)
@@ -105,20 +92,6 @@ func (c *GitHubAPIClient) GetReadmes(repos []Repo) {
 			c.logger.Info(fmt.Sprintf("Wrote %q README to file at %s/%s", repo.Name, dirName, filename))
 		}
 	}
-}
-
-func getReadme(ctx context.Context, client *github.Client, repo Repo) (string, error) {
-	readme, _, err := client.Repositories.GetReadme(ctx, repo.Author, repo.Name, nil)
-	if err != nil {
-		return "", err
-	}
-
-	content, err := readme.GetContent()
-	if err != nil {
-		return "", err
-	}
-
-	return content, nil
 }
 
 func writeReadmeToFile(repo Repo, dirName, filename string) error {
