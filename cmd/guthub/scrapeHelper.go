@@ -35,8 +35,8 @@ func (s *scrapeHelper) getTrendingRepos(url string, limit int) {
 		link := e.Attr("href")
 		linkParts := strings.Split(strings.Trim(link, "/"), "/")
 		s.repos = append(s.repos, githubapi.Repo{
-			Author: linkParts[0],
-			Name:   linkParts[1],
+			Owner: linkParts[0],
+			Name:  linkParts[1],
 		})
 	})
 

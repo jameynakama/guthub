@@ -23,9 +23,9 @@ func TestGetRepos(t *testing.T) {
 	defer server.Close()
 
 	expRepos := []githubapi.Repo{
-		{Author: "someone", Name: "ugly-cats"},
-		{Author: "someone", Name: "a-spicy-a-meat-a-ball-a"},
-		{Author: "someone", Name: "the-sisters-karamazov"},
+		{Owner: "someone", Name: "ugly-cats"},
+		{Owner: "someone", Name: "a-spicy-a-meat-a-ball-a"},
+		{Owner: "someone", Name: "the-sisters-karamazov"},
 	}
 
 	sh := newScrapeHelper(&testLogger{})
@@ -42,11 +42,11 @@ func TestGetRepoDefaultLimit(t *testing.T) {
 	defer server.Close()
 
 	expRepos := []githubapi.Repo{
-		{Author: "someone", Name: "ugly-cats"},
-		{Author: "someone", Name: "a-spicy-a-meat-a-ball-a"},
-		{Author: "someone", Name: "the-sisters-karamazov"},
-		{Author: "someone", Name: "poop-jokes"},
-		{Author: "someone", Name: "cycle-jordan"},
+		{Owner: "someone", Name: "ugly-cats"},
+		{Owner: "someone", Name: "a-spicy-a-meat-a-ball-a"},
+		{Owner: "someone", Name: "the-sisters-karamazov"},
+		{Owner: "someone", Name: "poop-jokes"},
+		{Owner: "someone", Name: "cycle-jordan"},
 	}
 
 	sh := newScrapeHelper(&testLogger{})

@@ -47,5 +47,5 @@ func run(cfg cfg) {
 	sh := newScrapeHelper(cfg.logger)
 	sh.getTrendingRepos(cfg.url, cfg.repoLimit)
 
-	cfg.ghClient.GetReadmes(sh.repos)
+	cfg.ghClient.GetReadmes(sh.repos, "guthub-output")
 }

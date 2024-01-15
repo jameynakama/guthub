@@ -12,7 +12,7 @@ import (
 )
 
 type Repo struct {
-	Author string
+	Owner  string
 	Name   string
 	Readme string
 }
@@ -40,7 +40,7 @@ func NewGutHubClient(ctx context.Context, rClient RepositoriesClient, l logging.
 	}
 }
 
-func (c *GutHubHelper) GetReadmes(repos []Repo) {
+func (c *GutHubHelper) GetReadmes(repos []Repo, outputDir string) {
 	var wg sync.WaitGroup
 	errCh := make(chan error, len(repos))
 	repoCh := make(chan Repo, len(repos))
@@ -55,7 +55,7 @@ func (c *GutHubHelper) GetReadmes(repos []Repo) {
 
 			c.logger.Info(fmt.Sprintf("Fetching %q README", repo.Name))
 
-			readme, _, err := c.RepoClient.GetReadme(c.ctx, repo.Author, repo.Name, nil)
+			readme, _, err := c.RepoClient.GetReadme(c.ctx, repo.Owner, repo.Name, nil)
 			if err != nil {
 				errCh <- err
 				return
@@ -84,12 +84,11 @@ func (c *GutHubHelper) GetReadmes(repos []Repo) {
 	}
 
 	for repo := range repoCh {
-		dirName := "guthub-output"
-		filename := fmt.Sprintf("%s--%s.md", repo.Author, repo.Name)
-		if err := writeReadmeToFile(repo, dirName, filename); err != nil {
+		filename := fmt.Sprintf("%s--%s.md", repo.Owner, repo.Name)
+		if err := writeReadmeToFile(repo, outputDir, filename); err != nil {
 			c.logger.Error(err)
 		} else {
-			c.logger.Info(fmt.Sprintf("Wrote %q README to file at %s/%s", repo.Name, dirName, filename))
+			c.logger.Info(fmt.Sprintf("Wrote %q README to file at %s/%s", repo.Name, outputDir, filename))
 		}
 	}
 }
