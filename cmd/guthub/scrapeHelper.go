@@ -9,17 +9,20 @@ import (
 	"github.com/jameynakama/guthub/cmd/logging"
 )
 
+// scrapeHelper is a helper for scraping GitHub.
 type scrapeHelper struct {
 	repos  []githubapi.Repo
 	logger logging.Logger
 }
 
+// newScrapeHelper returns a new scrapeHelper.
 func newScrapeHelper(l logging.Logger) *scrapeHelper {
 	return &scrapeHelper{
 		logger: l,
 	}
 }
 
+// getTrendingRepos scrapes the GitHub trending page for repositories.
 func (s *scrapeHelper) getTrendingRepos(url string, limit int) {
 	c := colly.NewCollector()
 

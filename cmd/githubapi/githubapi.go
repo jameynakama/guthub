@@ -11,12 +11,14 @@ import (
 	"github.com/jameynakama/guthub/cmd/logging"
 )
 
+// Repo represents a GitHub repository.
 type Repo struct {
 	Owner  string
 	Name   string
 	Readme string
 }
 
+// RepositoriesClient is an interface for the GitHub API's Repositories service.
 type RepositoriesClient interface {
 	GetReadme(
 		ctx context.Context,
@@ -26,12 +28,14 @@ type RepositoriesClient interface {
 	) (*github.RepositoryContent, *github.Response, error)
 }
 
+// GutHubHelper is a wrapper for the GitHub API.
 type GutHubHelper struct {
 	ctx        context.Context
 	RepoClient RepositoriesClient
 	logger     logging.Logger
 }
 
+// NewGutHubClient returns a new GutHubHelper.
 func NewGutHubClient(ctx context.Context, rClient RepositoriesClient, l logging.Logger) *GutHubHelper {
 	return &GutHubHelper{
 		ctx:        ctx,
@@ -40,6 +44,7 @@ func NewGutHubClient(ctx context.Context, rClient RepositoriesClient, l logging.
 	}
 }
 
+// GetReadmes fetches the READMEs for the given repositories and writes them to files.
 func (c *GutHubHelper) GetReadmes(repos []Repo, outputDir string) {
 	var wg sync.WaitGroup
 	errCh := make(chan error, len(repos))
