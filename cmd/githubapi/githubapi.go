@@ -3,6 +3,8 @@ package githubapi
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/google/go-github/v58/github"
@@ -13,6 +15,7 @@ import (
 type Repo struct {
 	Author string
 	Name   string
+	Readme string
 }
 
 type GitHubAPI interface {
@@ -24,7 +27,8 @@ type GitHubAPI interface {
 	) (
 		file *github.RepositoryContent,
 		directoryContent []*github.RepositoryContent,
-		resp *github.Response, err error,
+		resp *github.Response,
+		err error,
 	)
 }
 
@@ -58,7 +62,7 @@ func (c *GitHubAPIClient) GetReadmes(repos []Repo) {
 
 	var wg sync.WaitGroup
 	errCh := make(chan error, len(repos))
-	readmeCh := make(chan string, len(repos))
+	repoCh := make(chan Repo, len(repos))
 
 	for _, repo := range repos {
 		// TODO: Use GH API to get text files
@@ -76,21 +80,29 @@ func (c *GitHubAPIClient) GetReadmes(repos []Repo) {
 				return
 			}
 
-			readmeCh <- readme
+			repo.Readme = readme
+
+			repoCh <- repo
 		}(repo)
+	}
 
-		go func() {
-			wg.Wait()
-			close(errCh)
-			close(readmeCh)
-		}()
+	go func() {
+		wg.Wait()
+		close(errCh)
+		close(repoCh)
+	}()
 
-		for err := range errCh {
+	for err := range errCh {
+		c.logger.Error(err)
+	}
+
+	for repo := range repoCh {
+		dirName := "guthub-output"
+		filename := fmt.Sprintf("%s--%s.md", repo.Author, repo.Name)
+		if err := writeReadmeToFile(repo, dirName, filename); err != nil {
 			c.logger.Error(err)
-		}
-
-		for readme := range readmeCh {
-			c.logger.Info(readme)
+		} else {
+			c.logger.Info(fmt.Sprintf("Wrote %q README to file at %s/%s", repo.Name, dirName, filename))
 		}
 	}
 }
@@ -107,4 +119,17 @@ func getReadme(ctx context.Context, client *github.Client, repo Repo) (string, e
 	}
 
 	return content, nil
+}
+
+func writeReadmeToFile(repo Repo, dirName, filename string) error {
+	// TODO: Allow user to specify output directory
+	if err := os.MkdirAll(dirName, 0755); err != nil {
+		return err
+	}
+
+	if err := os.WriteFile(filepath.Join(dirName, filename), []byte(repo.Readme), 0644); err != nil {
+		return err
+	}
+
+	return nil
 }
