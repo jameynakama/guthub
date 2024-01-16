@@ -68,7 +68,8 @@ func TestGetReadmes(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, "# Hello", string(file))
+		fileHeading := fmt.Sprintf("---\n[GUTHUB] Repo link: https://github.com/%s/%s\n---\n\n", repo.Owner, repo.Name)
+		assert.Equal(t, string(file), fileHeading+"# Hello")
 	}
 }
 

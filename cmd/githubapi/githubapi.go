@@ -104,7 +104,20 @@ func writeReadmeToFile(repo Repo, dirName, filename string) error {
 		return err
 	}
 
-	if err := os.WriteFile(filepath.Join(dirName, filename), []byte(repo.Readme), 0644); err != nil {
+	file, err := os.OpenFile(filepath.Join(dirName, filename), os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	fileHeading := fmt.Sprintf("---\n[GUTHUB] Repo link: https://github.com/%s/%s\n---\n\n", repo.Owner, repo.Name)
+	_, err = file.WriteString(fileHeading)
+	if err != nil {
+		return err
+	}
+
+	_, err = file.Write([]byte(repo.Readme))
+	if err != nil {
 		return err
 	}
 
