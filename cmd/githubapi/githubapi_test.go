@@ -60,7 +60,7 @@ func TestGetReadmes(t *testing.T) {
 		},
 	}
 
-	mGuthubHelper.GetReadmes(repos, tempOutDir)
+	mGuthubHelper.GetReadmes(repos, tempOutDir, false)
 
 	for _, repo := range repos {
 		file, err := os.ReadFile(filepath.Join(tempOutDir, fmt.Sprintf("%s--%s.md", repo.Owner, repo.Name)))
@@ -85,10 +85,10 @@ func TestGetReadmesError(t *testing.T) {
 		{Owner: "chill-smith", Name: "is-true"},
 	}
 
-	mGuthubHelper.GetReadmes(repos, tempOutDir)
+	mGuthubHelper.GetReadmes(repos, tempOutDir, false)
 
-	assert.Equal(t, mLogger.errorLog[0], "ERROR bike-tyson\n")
-	assert.Equal(t, mLogger.errorLog[1], "ERROR cycle-jordan\n")
+	assert.InSlice(t, mLogger.errorLog, "ERROR bike-tyson\n")
+	assert.InSlice(t, mLogger.errorLog, "ERROR cycle-jordan\n")
 
 	files, err := os.ReadDir(tempOutDir)
 	if err != nil {

@@ -15,13 +15,15 @@ const DEFAULT_LIMIT = 25
 
 type cfg struct {
 	repoLimit int
+	openFiles bool
 	url       string
 	logger    logging.Logger
 	ghClient  *githubapi.GutHubHelper
 }
 
 func main() {
-	repoLimit := flag.Int("l", DEFAULT_LIMIT, "limit of repositories to scrape")
+	repoLimit := flag.Int("l", DEFAULT_LIMIT, "limit of repositories to read")
+	openFiles := flag.Bool("open", false, "open files automatically after writing them")
 	flag.Parse()
 
 	logger := logging.NewGutHubLogger(os.Stdout, os.Stdout, os.Stderr, "[GUTHUB] ", 0)
@@ -35,6 +37,7 @@ func main() {
 
 	cfg := cfg{
 		repoLimit: *repoLimit,
+		openFiles: *openFiles,
 		url:       "https://github.com/trending/",
 		logger:    logger,
 		ghClient:  client,
@@ -47,5 +50,5 @@ func run(cfg cfg) {
 	sh := newScrapeHelper(cfg.logger)
 	sh.getTrendingRepos(cfg.url, cfg.repoLimit)
 
-	cfg.ghClient.GetReadmes(sh.repos, "guthub-output")
+	cfg.ghClient.GetReadmes(sh.repos, "guthub-output", cfg.openFiles)
 }

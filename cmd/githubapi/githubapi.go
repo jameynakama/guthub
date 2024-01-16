@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"sync"
 
 	"github.com/google/go-github/v58/github"
@@ -45,7 +47,7 @@ func NewGutHubClient(ctx context.Context, rClient RepositoriesClient, l logging.
 }
 
 // GetReadmes fetches the READMEs for the given repositories and writes them to files.
-func (c *GutHubHelper) GetReadmes(repos []Repo, outputDir string) {
+func (c *GutHubHelper) GetReadmes(repos []Repo, outputDir string, openFiles bool) {
 	var wg sync.WaitGroup
 	errCh := make(chan error, len(repos))
 	repoCh := make(chan Repo, len(repos))
@@ -90,36 +92,74 @@ func (c *GutHubHelper) GetReadmes(repos []Repo, outputDir string) {
 
 	for repo := range repoCh {
 		filename := fmt.Sprintf("%s--%s.md", repo.Owner, repo.Name)
-		if err := writeReadmeToFile(repo, outputDir, filename); err != nil {
+		fPath, err := writeReadmeToFile(repo, outputDir, filename)
+		if err != nil {
 			c.logger.Error(err)
+			continue
 		} else {
 			c.logger.Info(fmt.Sprintf("Wrote %q README to file at %s/%s", repo.Name, outputDir, filename))
+		}
+
+		if openFiles {
+			if err := openFile(fPath); err != nil {
+				c.logger.Error(err)
+				continue
+			}
 		}
 	}
 }
 
-func writeReadmeToFile(repo Repo, dirName, filename string) error {
+func writeReadmeToFile(repo Repo, dirName, filename string) (string, error) {
 	// TODO: Allow user to specify output directory
 	if err := os.MkdirAll(dirName, 0755); err != nil {
-		return err
+		return "", err
 	}
 
-	file, err := os.OpenFile(filepath.Join(dirName, filename), os.O_WRONLY|os.O_CREATE, 0644)
+	fPath := filepath.Join(dirName, filename)
+
+	file, err := os.OpenFile(fPath, os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer file.Close()
 
 	fileHeading := fmt.Sprintf("---\n[GUTHUB] Repo link: https://github.com/%s/%s\n---\n\n", repo.Owner, repo.Name)
 	_, err = file.WriteString(fileHeading)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	_, err = file.Write([]byte(repo.Readme))
 	if err != nil {
+		return "", err
+	}
+
+	return fPath, nil
+}
+
+// Opens the file at the given path with the default application.
+func openFile(fPath string) error {
+	var cmdName string
+
+	switch runtime.GOOS {
+	case "darwin":
+		cmdName = "open"
+	case "linux":
+		cmdName = "xdg-open"
+	case "windows":
+		cmdName = "cmd.exe"
+	default:
+		return fmt.Errorf("Unsupported platform for opening files")
+	}
+
+	cmdParams := []string{fPath}
+
+	cmdPath, err := exec.LookPath(cmdName)
+	if err != nil {
 		return err
 	}
 
-	return nil
+	err = exec.Command(cmdPath, cmdParams...).Run()
+
+	return err
 }

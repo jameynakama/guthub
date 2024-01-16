@@ -10,8 +10,7 @@ grammatical mistakes that can then be PRed against.
 - Improved testing (currently missing a few lines of coverage, and no
   integration tests)
 - Flag for choosing specific output directory
-- Flag for choosing to write to a temp dir and temp files
-- Flag for choosing to auto-open files (will be implicit with temp files)
+- Flag for choosing to write to a temp dir and temp files (and open them)
 
 ## Installation
 
