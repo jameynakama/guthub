@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 
 	"github.com/google/go-github/v58/github"
@@ -12,6 +13,8 @@ import (
 )
 
 const DEFAULT_LIMIT = 25
+
+var Version = "development"
 
 type cfg struct {
 	repoLimit int
@@ -24,7 +27,13 @@ type cfg struct {
 func main() {
 	repoLimit := flag.Int("l", DEFAULT_LIMIT, "limit of repositories to read")
 	openFiles := flag.Bool("open", false, "open files automatically after writing them")
+	version := flag.Bool("version", false, "print the app version and exit")
 	flag.Parse()
+
+	if *version {
+		fmt.Println("guthub version:", Version)
+		os.Exit(0)
+	}
 
 	logger := logging.NewGutHubLogger(os.Stdout, os.Stdout, os.Stderr, "[GUTHUB] ", 0)
 	ctx := context.Background()

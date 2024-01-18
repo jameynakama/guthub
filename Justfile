@@ -20,5 +20,5 @@ test-cover-html:
 test-cover-func:
   go test -coverprofile cover.out ./... && go tool cover -func cover.out
 
-build:
-  go build -o bin/guthub ./cmd/guthub
+build VERSION:
+  go build -v -ldflags="-X 'main.Version=v{{VERSION}}'" -o bin/guthub ./cmd/guthub
