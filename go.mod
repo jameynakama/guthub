@@ -5,7 +5,7 @@ go 1.21.1
 require (
 	github.com/gocolly/colly/v2 v2.1.0
 	github.com/google/go-github/v58 v58.0.0
-	github.com/jameynakama/assert v0.0.0-20240116030946-98729fb626ae
+	github.com/jameynakama/assert v0.0.1
 	golang.org/x/oauth2 v0.16.0
 )
 

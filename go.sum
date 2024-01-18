@@ -63,8 +63,8 @@ github.com/google/go-github/v58 v58.0.0 h1:Una7GGERlF/37XfkPwpzYJe0Vp4dt2k1kCjlx
 github.com/google/go-github/v58 v58.0.0/go.mod h1:k4hxDKEfoWpSqFlc8LTpGd9fu2KrV1YAa6Hi6FmDNY4=
 github.com/google/go-querystring v1.1.0 h1:AnCroh3fv4ZBgVIf1Iwtovgjaw/GiKJo8M8yD/fhyJ8=
 github.com/google/go-querystring v1.1.0/go.mod h1:Kcdr2DB4koayq7X8pmAG4sNG59So17icRSOU623lUBU=
-github.com/jameynakama/assert v0.0.0-20240116030946-98729fb626ae h1:mQZ/hViP8CVitmVNEvgb4EYXeG9y3XB94LeYOB8D2gk=
-github.com/jameynakama/assert v0.0.0-20240116030946-98729fb626ae/go.mod h1:kbbux889dwdent9/vJyUBtp9Ao7xf0TwkrhdC4RqRxs=
+github.com/jameynakama/assert v0.0.1 h1:lPsWIt9nAJpqbwqI9ZXmgpRsExmVDsSPvoKTTU9TVds=
+github.com/jameynakama/assert v0.0.1/go.mod h1:kbbux889dwdent9/vJyUBtp9Ao7xf0TwkrhdC4RqRxs=
 github.com/jawher/mow.cli v1.1.0/go.mod h1:aNaQlc7ozF3vw6IJ2dHjp2ZFiA4ozMIYY6PyuRJwlUg=
 github.com/kennygrant/sanitize v1.2.4 h1:gN25/otpP5vAsO2djbMhF/LQX6R7+O1TB4yv8NzpJ3o=
 github.com/kennygrant/sanitize v1.2.4/go.mod h1:LGsjYYtgxbetdg5owWB2mpgUL6e2nfw2eObZ0u0qvak=
