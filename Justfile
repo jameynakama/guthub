@@ -21,4 +21,4 @@ test-cover-func:
   go test -coverprofile cover.out ./... && go tool cover -func cover.out
 
 build:
-  go build -o bin/guthub ./...
+  go build -o bin/guthub ./cmd/guthub
