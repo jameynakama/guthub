@@ -123,7 +123,7 @@ func writeReadmeToFile(repo Repo, dirName, filename string) (string, error) {
 	}
 	defer file.Close()
 
-	fileHeading := fmt.Sprintf("---\n[GUTHUB] Repo link: https://github.com/%s/%s\n---\n\n", repo.Owner, repo.Name)
+	fileHeading := fmt.Sprintf("---\n[GUTHUB] Repo link: <https://github.com/%s/%s>\n---\n\n", repo.Owner, repo.Name)
 	_, err = file.WriteString(fileHeading)
 	if err != nil {
 		return "", err
