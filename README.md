@@ -34,12 +34,14 @@ The tool will grab all top 25 repos without any args.
 It will save the READMEs in `CWD/guthub-output/` with the pattern
 `<owner>--<repo-name>.md`.
 
-`$ GH_TOKEN=<your-token> guthub -l 3`
-
 ```text
+$ guthub -h`
+
 Usage of guthub:
- -l int
-   limit of repositories to scrape (default 25)
+  -l int
+     limit of repositories to read (default 25)
+  -open
+     open files automatically after writing them
 ```
 
 Example: `GH_TOKEN=<your-token> guthub -l 3`
